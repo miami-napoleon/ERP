@@ -1,0 +1,33 @@
+{
+    "products": {
+        "Heirloom Tomato": {
+            "category": "Vegetable",
+            "icon": "\ud83e\udd66",
+            "base_unit": "lbs",
+            "pool": 130.0,
+            "known_units": {
+                "Standard Crate": 20.0,
+                "Small Box": 10.0,
+                "bag": 5.0
+            }
+        }
+    },
+    "history": [
+        {
+            "timestamp": "2026-02-07 22:04",
+            "product": "Heirloom Tomato",
+            "action": "OUT",
+            "qty_display": "10 bag",
+            "weight_change": 50.0,
+            "pool_after": 130.0
+        },
+        {
+            "timestamp": "2026-02-07 22:03",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "qty_display": "9 Standard Crate",
+            "weight_change": 180.0,
+            "pool_after": 180.0
+        }
+    ]
+}

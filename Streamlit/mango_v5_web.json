@@ -1,0 +1,66 @@
+{
+    "products": {
+        "Heirloom Tomato": {
+            "category": "Vegetable",
+            "icon": "\ud83e\udd66",
+            "pool": 1660.0,
+            "known_units": {
+                "Standard Crate": 20.0,
+                "Small Box": 10.0,
+                "case": 500.0
+            }
+        },
+        "Carrot": {
+            "category": "Vegetable",
+            "icon": "\ud83e\udd66",
+            "pool": 0.0,
+            "known_units": {
+                "Standard Crate": 20.0,
+                "Small Box": 10.0
+            }
+        },
+        "apple": {
+            "category": "Fruit",
+            "icon": "\ud83c\udf4e",
+            "pool": 0.0,
+            "known_units": {
+                "Standard Crate": 20.0,
+                "Small Box": 10.0
+            }
+        }
+    },
+    "history": [
+        {
+            "timestamp": "2026-02-07 22:44",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "qty_display": "3.0 case",
+            "weight_change": 1500.0,
+            "pool_after": 1660.0
+        },
+        {
+            "timestamp": "2026-02-07 22:39",
+            "product": "Heirloom Tomato",
+            "action": "OUT",
+            "qty_display": "2.0 Small Box",
+            "weight_change": 20.0,
+            "pool_after": 160.0
+        },
+        {
+            "timestamp": "2026-02-07 22:39",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "qty_display": "6.0 Standard Crate",
+            "weight_change": 120.0,
+            "pool_after": 180.0
+        },
+        {
+            "timestamp": "2026-02-07 22:38",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "qty_display": "3.0 Standard Crate",
+            "weight_change": 60.0,
+            "pool_after": 60.0
+        }
+    ]
+}

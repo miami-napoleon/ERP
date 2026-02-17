@@ -1,0 +1,29 @@
+{
+    "products": {
+        "Heirloom Tomato": {
+            "category": "Vegetable",
+            "icon": "\ud83e\udd66",
+            "base_unit": "lbs",
+            "pool": 300.0,
+            "known_units": {
+                "Standard Crate": 20.0,
+                "Small Box": 10.0,
+                "case": 30.0
+            }
+        }
+    },
+    "history": [
+        {
+            "timestamp": "21:59",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "desc": "6 case (180.0 lbs)"
+        },
+        {
+            "timestamp": "21:53",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "desc": "6 Standard Crate (120.0 lbs)"
+        }
+    ]
+}

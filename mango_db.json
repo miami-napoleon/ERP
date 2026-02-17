@@ -1,0 +1,44 @@
+{
+    "products": {
+        "Heirloom Tomato": {
+            "name": "Heirloom Tomato",
+            "category": "Vegetable",
+            "base_unit": "lbs",
+            "pool": 354.5,
+            "known_units": {
+                "Crate (Large)": 22.0,
+                "Plastic Pint": 0.75,
+                "cases": 50.0
+            }
+        }
+    },
+    "history": [
+        {
+            "timestamp": "2026-02-07 21:50:02",
+            "product": "Heirloom Tomato",
+            "action": "OUT",
+            "input_qty": "1.0 cases",
+            "conversion": "1 cases = 50.0 lbs",
+            "total_change_lbs": 50.0,
+            "pool_after": 354.5
+        },
+        {
+            "timestamp": "2026-02-07 21:49:29",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "input_qty": "8.0 cases",
+            "conversion": "1 cases = 50.0 lbs",
+            "total_change_lbs": 400.0,
+            "pool_after": 404.5
+        },
+        {
+            "timestamp": "2026-02-07 21:48:18",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "input_qty": "6.0 Plastic Pint",
+            "conversion": "1 Plastic Pint = 0.75 lbs",
+            "total_change_lbs": 4.5,
+            "pool_after": 4.5
+        }
+    ]
+}

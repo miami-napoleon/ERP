@@ -1,0 +1,15 @@
+{
+    "products": {
+        "Heirloom Tomato": {
+            "category": "Vegetable",
+            "icon": "\ud83e\udd66",
+            "base_unit": "lbs",
+            "pool": 0.0,
+            "known_units": {
+                "Standard Crate": 20.0,
+                "Small Box": 10.0
+            }
+        }
+    },
+    "history": []
+}
