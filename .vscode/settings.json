@@ -1,0 +1,9 @@
+{
+    "python.defaultInterpreterPath": "/Library/Developer/CommandLineTools/usr/bin/python3",
+    "python.analysis.extraPaths": [
+        "/Users/gil/Library/Python/3.9/lib/python/site-packages"
+    ],
+    "python.autoComplete.extraPaths": [
+        "/Users/gil/Library/Python/3.9/lib/python/site-packages"
+    ]
+}

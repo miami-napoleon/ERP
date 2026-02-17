@@ -10,6 +10,7 @@ DB_FILE = "mango_v4.json"
 # --- BACKEND (LOGIC) ---
 class Database:
     def __init__(self):
+        self.data = {}
         self.load_db()
 
     def load_db(self):

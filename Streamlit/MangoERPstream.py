@@ -11,6 +11,7 @@ st.set_page_config(page_title="MangoClub Cloud", page_icon="🥭", layout="cente
 # --- BACKEND LOGIC (Cached Resource) ---
 class Database:
     def __init__(self):
+        self.data = {}
         self.load_db()
 
     def load_db(self):
