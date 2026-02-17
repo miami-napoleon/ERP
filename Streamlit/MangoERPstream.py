@@ -3,6 +3,7 @@ import json
 import os
 import pandas as pd
 from datetime import datetime
+import plotly.graph_objects as go
 
 # --- CONFIGURATION ---
 DB_FILE = "mango_v5_web.json"
@@ -18,13 +19,19 @@ class Database:
         if not os.path.exists(DB_FILE):
             self.data = {
                 "products": {},
-                "history": []
+                "history": [],
+                "contacts": {} # {name: {type: 'Vendor'/'Customer'}}
             }
             # Demo Data
             self.add_product("Heirloom Tomato", "Vegetable")
+            self.add_contact("Farm Supply Co", "Vendor")
+            self.add_contact("Local Market", "Customer")
         else:
             with open(DB_FILE, "r") as f:
                 self.data = json.load(f)
+            # Migration for existing DBs
+            if "contacts" not in self.data:
+                self.data["contacts"] = {}
 
     def save_db(self):
         with open(DB_FILE, "w") as f:
@@ -52,7 +59,14 @@ class Database:
         self.save_db()
         return True, "Success"
 
-    def update_pool(self, product_name, qty, unit_name, unit_weight, action):
+    def add_contact(self, name, type):
+        if name in self.data["contacts"]:
+            return False, "Contact already exists!"
+        self.data["contacts"][name] = {"type": type}
+        self.save_db()
+        return True, "Contact Added"
+
+    def update_pool(self, product_name, qty, unit_name, unit_weight, action, contact_name="Unspecified"):
         product = self.data["products"][product_name]
         total_lbs = float(qty) * float(unit_weight)
         
@@ -73,7 +87,8 @@ class Database:
             "action": action,
             "qty_display": f"{qty} {unit_name}",
             "weight_change": total_lbs,
-            "pool_after": product["pool"]
+            "pool_after": product["pool"],
+            "contact": contact_name
         })
         self.save_db()
         return True, f"Success! {action} {total_lbs:.1f} lbs"
@@ -115,6 +130,12 @@ def render_home():
                         st.error(msg)
                 else:
                     st.warning("Name is required.")
+
+    st.divider()
+
+    # 1.5 Contact Management Button
+    if st.button("👥 Manage Contacts"):
+        navigate_to("contacts")
 
     st.divider()
 
@@ -160,6 +181,51 @@ def render_home():
                 navigate_to("product", p_name)
         st.divider()
 
+# --- VIEW 1.5: CONTACTS MANAGER ---
+def render_contacts():
+    st.title("👥 Contact Manager")
+    if st.button("← Back to Home"):
+        navigate_to("home")
+    
+    # Add New Contact
+    with st.expander("➕ Add New Contact", expanded=True):
+        with st.form("add_contact_form"):
+            c_name = st.text_input("Contact Name/Entity")
+            c_type = st.radio("Type", ["Vendor", "Customer"], horizontal=True)
+            submitted = st.form_submit_button("Save Contact")
+            if submitted:
+                if c_name:
+                    success, msg = db.add_contact(c_name, c_type)
+                    if success:
+                        st.success(f"Added {c_name}")
+                        st.rerun()
+                    else:
+                        st.error(msg)
+                else:
+                    st.warning("Name required")
+
+    st.divider()
+    
+    # List Contacts
+    st.subheader("Directory")
+    contacts = db.data.get("contacts", {})
+    if not contacts:
+        st.info("No contacts yet.")
+    else:
+        # Separate by type for better viewing
+        vendors = [name for name, info in contacts.items() if info["type"] == "Vendor"]
+        customers = [name for name, info in contacts.items() if info["type"] == "Customer"]
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown("### 🏢 Vendors (Sources)")
+            for v in vendors:
+                st.markdown(f"- **{v}**")
+        with c2:
+             st.markdown("### 🛒 Customers (Destinations)")
+             for c in customers:
+                 st.markdown(f"- **{c}**")
+
 # --- VIEW 2: PRODUCT HUB ---
 def render_product():
     p_name = st.session_state.selected_product
@@ -175,7 +241,7 @@ def render_product():
     st.metric(label="Current Inventory (Pool)", value=f"{p_data['pool']:.2f} lbs")
     
     # Tabs
-    tab_harvest, tab_sell, tab_history = st.tabs(["📥 Harvest (IN)", "📤 Sell (OUT)", "📈 History"])
+    tab_harvest, tab_sell, tab_history, tab_chain = st.tabs(["📥 Harvest (IN)", "📤 Sell (OUT)", "📈 History", "🔗 Supply Chain"])
     
     # --- DYNAMIC FORM LOGIC ---
     # This uses the 'Reactive' approach (no st.form) so the New Unit fields appear instantly
@@ -183,6 +249,22 @@ def render_product():
         with tab:
             color = "green" if action == "IN" else "red"
             btn_label = "Confirm Harvest" if action == "IN" else "Confirm Sale"
+            
+            # --- Contact Selection ---
+            contacts = db.data.get("contacts", {})
+            contact_options = ["Unspecified"]
+            
+            if action == "IN":
+                # Filter for Vendors
+                contact_options += [name for name, info in contacts.items() if info["type"] == "Vendor"]
+                contact_label = "Source (Vendor)"
+            else:
+                # Filter for Customers
+                contact_options += [name for name, info in contacts.items() if info["type"] == "Customer"]
+                contact_label = "Destination (Customer)"
+                
+            selected_contact = st.selectbox(contact_label, contact_options, key=f"contact_{action}")
+            # -------------------------
             
             # 1. Standard Inputs
             c1, c2 = st.columns(2)
@@ -223,8 +305,9 @@ def render_product():
                     final_unit_name = unit_options[index]
                     final_weight = p_data["known_units"][final_unit_name]
                 
+                
                 if qty > 0:
-                    success, msg = db.update_pool(p_name, qty, final_unit_name, final_weight, action)
+                    success, msg = db.update_pool(p_name, qty, final_unit_name, final_weight, action, selected_contact)
                     if success:
                         st.toast(msg, icon="✅")
                         st.rerun()
@@ -250,15 +333,136 @@ def render_product():
             st.subheader("Transaction Log")
             for log in logs:
                 icon = "🟢" if log["action"] == "IN" else "🔴"
-                st.markdown(f"**{log['timestamp']}** | {icon} {log['action']}")
+                contact_info = log.get("contact", "Unspecified")
+                contact_display = f"From: {contact_info}" if log["action"] == "IN" else f"To: {contact_info}"
+                
+                st.markdown(f"**{log['timestamp']}** | {icon} {log['action']} | {contact_display}")
                 st.text(f"{log['qty_display']} ({log['weight_change']:.1f} lbs)")
                 st.caption(f"Pool after: {log['pool_after']:.1f} lbs")
                 st.divider()
         else:
             st.info("No history available yet.")
 
+    # --- TAB 4: SUPPLY CHAIN ---
+    with tab_chain:
+        st.subheader("Supply Chain Visualization")
+        render_supply_chain_sankey(p_name, p_data, db.data["history"])
+
+def render_supply_chain_sankey(product_name, product_data, history):
+    # Filter logs for this product
+    logs = [x for x in history if x["product"] == product_name]
+    
+    if not logs:
+        st.info("Not enough data to visualize supply chain.")
+        return
+
+    # Data Aggregation
+    in_flows = {}  # Source -> Amount
+    out_flows = {} # Destination -> Amount
+    total_in = 0.0
+    total_out = 0.0
+    
+    for log in logs:
+        contact = log.get("contact", "Unspecified")
+        weight = float(log["weight_change"])
+        
+        if log["action"] == "IN":
+            in_flows[contact] = in_flows.get(contact, 0.0) + weight
+            total_in += weight
+        elif log["action"] == "OUT":
+            out_flows[contact] = out_flows.get(contact, 0.0) + weight
+            total_out += weight
+
+    current_stock = product_data["pool"]
+    
+    # Balance Check
+    # Total Available = Total IN ( + Initial if we tracked it, but assuming 0 for now)
+    # Total Used = Total OUT + Current Stock
+    # If Total IN < Total Used, we have an "Initial Stock" or "Unknown Source" mismatch
+    
+    balance_gap = (total_out + current_stock) - total_in
+    if balance_gap > 0.1: # Threshold for float errors
+        in_flows["Initial / Unknown"] = in_flows.get("Initial / Unknown", 0.0) + balance_gap
+
+    # Node Setup
+    # Indices: 
+    # 0..N-1 : Vendors
+    # N      : MangoClub Farm (Central Node)
+    # N+1..M : Customers
+    # M+1    : Current Stock
+    
+    labels = []
+    source_indices = []
+    target_indices = []
+    values = []
+    colors = []
+    
+    # 1. Vendors (Sources)
+    vendor_map = {} # Name -> Index
+    for v_name in in_flows:
+        vendor_map[v_name] = len(labels)
+        labels.append(v_name)
+        colors.append("#66c2a5") # Tealish
+        
+    # 2. Central Node (Us)
+    farm_idx = len(labels)
+    labels.append("MangoClub Farm")
+    colors.append("#fc8d62") # Orange-ish
+    
+    # 3. Customers (Destinations)
+    customer_map = {} # Name -> Index
+    for c_name in out_flows:
+        customer_map[c_name] = len(labels)
+        labels.append(c_name)
+        colors.append("#8da0cb") # Blue-ish
+
+    # 4. Current Stock (Sink)
+    stock_idx = len(labels)
+    labels.append(f"Current Stock ({current_stock:.1f} lbs)")
+    colors.append("#e78ac3") # Pinkish
+    
+    # -- LINKS --
+    
+    # Vendors -> Farm
+    for v_name, amount in in_flows.items():
+        source_indices.append(vendor_map[v_name])
+        target_indices.append(farm_idx)
+        values.append(amount)
+        
+    # Farm -> Customers
+    for c_name, amount in out_flows.items():
+        source_indices.append(farm_idx)
+        target_indices.append(customer_map[c_name])
+        values.append(amount)
+        
+    # Farm -> Current Stock
+    if current_stock > 0:
+        source_indices.append(farm_idx)
+        target_indices.append(stock_idx)
+        values.append(current_stock)
+        
+    # Plot
+    fig = go.Figure(data=[go.Sankey(
+        node = dict(
+          pad = 15,
+          thickness = 20,
+          line = dict(color = "black", width = 0.5),
+          label = labels,
+          color = colors
+        ),
+        link = dict(
+          source = source_indices,
+          target = target_indices,
+          value = values
+      ))])
+
+    fig.update_layout(title_text=f"{product_name} Supply Chain Flow", font_size=12)
+    st.plotly_chart(fig, use_container_width=True)
+
 # --- MAIN APP ROUTER ---
 if st.session_state.current_view == "home":
     render_home()
+elif st.session_state.current_view == "contacts":
+    render_contacts()
 elif st.session_state.current_view == "product":
     render_product()

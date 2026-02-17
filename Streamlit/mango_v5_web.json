@@ -3,7 +3,7 @@
         "Heirloom Tomato": {
             "category": "Vegetable",
             "icon": "\ud83e\udd66",
-            "pool": 1660.0,
+            "pool": 2660.02,
             "known_units": {
                 "Standard Crate": 20.0,
                 "Small Box": 10.0,
@@ -13,7 +13,7 @@
         "Carrot": {
             "category": "Vegetable",
             "icon": "\ud83e\udd66",
-            "pool": 0.0,
+            "pool": 70.0,
             "known_units": {
                 "Standard Crate": 20.0,
                 "Small Box": 10.0
@@ -30,6 +30,69 @@
         }
     },
     "history": [
+        {
+            "timestamp": "2026-02-16 22:55",
+            "product": "Carrot",
+            "action": "IN",
+            "qty_display": "1.0 Standard Crate",
+            "weight_change": 20.0,
+            "pool_after": 70.0,
+            "contact": "Alpha Farms"
+        },
+        {
+            "timestamp": "2026-02-16 22:54",
+            "product": "Carrot",
+            "action": "IN",
+            "qty_display": "2.0 Standard Crate",
+            "weight_change": 40.0,
+            "pool_after": 50.0,
+            "contact": "kiko farm"
+        },
+        {
+            "timestamp": "2026-02-16 22:42",
+            "product": "Carrot",
+            "action": "OUT",
+            "qty_display": "1.0 Small Box",
+            "weight_change": 10.0,
+            "pool_after": 10.0,
+            "contact": "Alpha FarmsBeta Market"
+        },
+        {
+            "timestamp": "2026-02-16 22:42",
+            "product": "Carrot",
+            "action": "IN",
+            "qty_display": "1.0 Standard Crate",
+            "weight_change": 20.0,
+            "pool_after": 20.0,
+            "contact": "kiko farm"
+        },
+        {
+            "timestamp": "2026-02-16 22:36",
+            "product": "Heirloom Tomato",
+            "action": "OUT",
+            "qty_display": "50.0 Standard Crate",
+            "weight_change": 1000.0,
+            "pool_after": 2660.02,
+            "contact": "Beta MarketAlpha FarmsBeta Market"
+        },
+        {
+            "timestamp": "2026-02-16 22:36",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "qty_display": "100.0 Standard Crate",
+            "weight_change": 2000.0,
+            "pool_after": 3660.02,
+            "contact": "Alpha Farms"
+        },
+        {
+            "timestamp": "2026-02-16 22:36",
+            "product": "Heirloom Tomato",
+            "action": "IN",
+            "qty_display": "0.001 Standard Crate",
+            "weight_change": 0.02,
+            "pool_after": 1660.02,
+            "contact": "Alpha Farms"
+        },
         {
             "timestamp": "2026-02-07 22:44",
             "product": "Heirloom Tomato",
@@ -62,5 +125,22 @@
             "weight_change": 60.0,
             "pool_after": 60.0
         }
-    ]
+    ],
+    "contacts": {
+        "Alpha Farms": {
+            "type": "Vendor"
+        },
+        "Alpha FarmsBeta Market": {
+            "type": "Customer"
+        },
+        "Beta MarketAlpha FarmsBeta Market": {
+            "type": "Customer"
+        },
+        "Beta MarketBeta MarketAlpha FarmsBeta Market": {
+            "type": "Customer"
+        },
+        "kiko farm": {
+            "type": "Vendor"
+        }
+    }
 }
